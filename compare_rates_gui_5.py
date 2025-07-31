@@ -11,22 +11,28 @@ def main():
     root = tk.Tk()
     root.withdraw()
 
+    # Вибір 5 файлів постачальників
     print("🔎 Вибери файл постачальника 1 (Code, Destination, Price, Increment)")
-    df1 = pd.read_excel(filedialog.askopenfilename())
+    file1 = filedialog.askopenfilename()
+    df1 = pd.read_excel(file1)
 
     print("🔎 Вибери файл постачальника 2 (Code, Destination, Price, Increment)")
-    df2 = pd.read_excel(filedialog.askopenfilename())
+    file2 = filedialog.askopenfilename()
+    df2 = pd.read_excel(file2)
 
     print("🔎 Вибери файл постачальника 3 (Code, Destination, Price, Increment)")
-    df3 = pd.read_excel(filedialog.askopenfilename())
+    file3 = filedialog.askopenfilename()
+    df3 = pd.read_excel(file3)
 
     print("🔎 Вибери файл постачальника 4 (Code, Destination, Price, Increment)")
-    df4 = pd.read_excel(filedialog.askopenfilename())
+    file4 = filedialog.askopenfilename()
+    df4 = pd.read_excel(file4)
 
     print("🔎 Вибери файл постачальника 5 (Code, Destination, Price, Increment)")
-    df5 = pd.read_excel(filedialog.askopenfilename())
+    file5 = filedialog.askopenfilename()
+    df5 = pd.read_excel(file5)
 
-    # Підготовка
+    # Підготовка даних
     df1 = prepare_df(df1, ['Code', 'Destination', 'Price', 'Increment'],
                      ['Code', 'Destination Pxn', 'Pxn Price', 'Pxn Increment'])
     df2 = prepare_df(df2, ['Code', 'Destination', 'Price', 'Increment'],
@@ -38,18 +44,18 @@ def main():
     df5 = prepare_df(df5, ['Code', 'Destination', 'Price', 'Increment'],
                      ['Code', 'Destination RingHD', 'RingHD Price', 'RingHD Increment'])
 
-    # Злиття
+    # Об'єднання всіх
     df_all = pd.merge(df1, df2, on='Code', how='outer')
     df_all = pd.merge(df_all, df3, on='Code', how='outer')
     df_all = pd.merge(df_all, df4, on='Code', how='outer')
     df_all = pd.merge(df_all, df5, on='Code', how='outer')
 
-    # Перетворення цін
+    # Конвертація цін у числовий тип
     price_cols = ['Pxn Price', 'SkyTel Price', 'SmartNet Price', 'SVM Price', 'RingHD Price']
     for col in price_cols:
         df_all[col] = pd.to_numeric(df_all[col], errors='coerce')
 
-    # Вибір максимальної ціни < 1
+    # 🧠 Найкраща ціна, постачальник, increment
     def find_best(row):
         providers = ['Pxn', 'SkyTel', 'SmartNet', 'SVM', 'RingHD']
         prices = {}
@@ -61,26 +67,24 @@ def main():
 
             if pd.notna(price):
                 try:
-                    price = float(price)
-                    if price < 1.0:
-                        prices[p] = price
-                        increments[p] = increment
+                    prices[p] = float(price)
+                    increments[p] = increment
                 except:
                     continue
 
         if not prices:
-            return pd.Series([None, None, None])
+            return pd.Series([None, None, None])  # якщо немає цін
 
-        best_provider = max(prices, key=prices.get)
+        # best_provider = max(prices, key=prices.get)
+        best_provider = min(prices, key=prices.get)
         best_price = prices[best_provider]
         best_increment = increments.get(best_provider, None)
 
         return pd.Series([best_price, best_provider, best_increment])
 
-    # Застосування
+    # ⬇️ Додаємо нові колонки
     df_all[['Best Price', 'Best Provider', 'Best Increment']] = df_all.apply(find_best, axis=1)
 
-    # Перегляд
     print("\n🔍 Перші рядки зведеного звіту:")
     print(df_all.head())
 
@@ -88,7 +92,7 @@ def main():
     save_path = filedialog.asksaveasfilename(defaultextension='.xlsx', filetypes=[("Excel files", "*.xlsx")])
     if save_path:
         df_all.to_excel(save_path, index=False)
-        print(f"✅ Файл збережено: {save_path}")
+        print(f"✅ Файл успішно збережено: {save_path}")
     else:
         print("❌ Збереження скасовано.")
 
