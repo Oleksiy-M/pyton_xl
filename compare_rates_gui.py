@@ -75,7 +75,7 @@ def main():
         if not prices:
             return pd.Series([None, None, None])  # якщо немає цін
 
-        best_provider = min(prices, key=prices.get)
+        best_provider = max(prices, key=prices.get)
         best_price = prices[best_provider]
         best_increment = increments.get(best_provider, None)
 
