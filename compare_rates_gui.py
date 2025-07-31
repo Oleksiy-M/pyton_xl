@@ -40,7 +40,7 @@ def main():
     df3 = prepare_df(df3, ['Code', 'Destination', 'Price', 'Increment'],
                      ['Code', 'Destination SmartNet', 'SmartNet Price', 'SmartNet Increment'])
     df4 = prepare_df(df4, ['Code', 'Destination', 'Price', 'Increment'],
-                     ['Code', 'Destination SVM', 'SVM Price', 'SVM Increment'])
+                     ['Code', 'Destination Forex', 'Forex Price', 'Forex Increment'])
     df5 = prepare_df(df5, ['Code', 'Destination', 'Price', 'Increment'],
                      ['Code', 'Destination RingHD', 'RingHD Price', 'RingHD Increment'])
 
@@ -51,38 +51,37 @@ def main():
     df_all = pd.merge(df_all, df5, on='Code', how='outer')
 
     # Конвертація цін у числовий тип
-    price_cols = ['Pxn Price', 'SkyTel Price', 'SmartNet Price', 'SVM Price', 'RingHD Price']
+    price_cols = ['Pxn Price', 'SkyTel Price', 'SmartNet Price', 'Forex Price', 'RingHD Price']
     for col in price_cols:
         df_all[col] = pd.to_numeric(df_all[col], errors='coerce')
 
-    # Пошук найкращої ціни + провайдера + increment
+    # 🧠 Найкраща ціна, постачальник, increment
     def find_best(row):
-        prices = {
-            'Pxn': row.get('Pxn Price', float('inf')),
-            'SkyTel': row.get('SkyTel Price', float('inf')),
-            'SmartNet': row.get('SmartNet Price', float('inf')),
-            'SVM': row.get('SVM Price', float('inf')),
-            'RingHD': row.get('RingHD Price', float('inf')),
-        }
-        increments = {
-            'Pxn': row.get('Pxn Increment'),
-            'SkyTel': row.get('SkyTel Increment'),
-            'SmartNet': row.get('SmartNet Increment'),
-            'SVM': row.get('SVM Increment'),
-            'RingHD': row.get('RingHD Increment'),
-        }
+        providers = ['Pxn', 'SkyTel', 'SmartNet', 'Forex', 'RingHD']
+        prices = {}
+        increments = {}
 
-        # Заміна NaN на inf
-        prices = {k: (v if pd.notna(v) else float('inf')) for k, v in prices.items()}
-        best_provider =max(prices, key=prices.get)
+        for p in providers:
+            price = row.get(f'{p} Price')
+            increment = row.get(f'{p} Increment')
+
+            if pd.notna(price):
+                try:
+                    prices[p] = float(price)
+                    increments[p] = increment
+                except:
+                    continue
+
+        if not prices:
+            return pd.Series([None, None, None])  # якщо немає цін
+
+        best_provider = min(prices, key=prices.get)
         best_price = prices[best_provider]
+        best_increment = increments.get(best_provider, None)
 
-        if best_price == float('inf'):
-            return pd.Series([None, None, None])  # Немає ціни
-
-        best_increment = increments.get(best_provider)
         return pd.Series([best_price, best_provider, best_increment])
 
+    # ⬇️ Додаємо нові колонки
     df_all[['Best Price', 'Best Provider', 'Best Increment']] = df_all.apply(find_best, axis=1)
 
     print("\n🔍 Перші рядки зведеного звіту:")
