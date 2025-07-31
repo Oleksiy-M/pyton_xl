@@ -40,7 +40,7 @@ def main():
     df3 = prepare_df(df3, ['Code', 'Destination', 'Price', 'Increment'],
                      ['Code', 'Destination SmartNet', 'SmartNet Price', 'SmartNet Increment'])
     df4 = prepare_df(df4, ['Code', 'Destination', 'Price', 'Increment'],
-                     ['Code', 'Destination Forex', 'Forex Price', 'Forex Increment'])
+                     ['Code', 'Destination SVM', 'SVM Price', 'SVM Increment'])
     df5 = prepare_df(df5, ['Code', 'Destination', 'Price', 'Increment'],
                      ['Code', 'Destination RingHD', 'RingHD Price', 'RingHD Increment'])
 
@@ -51,13 +51,13 @@ def main():
     df_all = pd.merge(df_all, df5, on='Code', how='outer')
 
     # Конвертація цін у числовий тип
-    price_cols = ['Pxn Price', 'SkyTel Price', 'SmartNet Price', 'Forex Price', 'RingHD Price']
+    price_cols = ['Pxn Price', 'SkyTel Price', 'SmartNet Price', 'SVM Price', 'RingHD Price']
     for col in price_cols:
         df_all[col] = pd.to_numeric(df_all[col], errors='coerce')
 
     # 🧠 Найкраща ціна, постачальник, increment
     def find_best(row):
-        providers = ['Pxn', 'SkyTel', 'SmartNet', 'Forex', 'RingHD']
+        providers = ['Pxn', 'SkyTel', 'SmartNet', 'SVM', 'RingHD']
         prices = {}
         increments = {}
 
