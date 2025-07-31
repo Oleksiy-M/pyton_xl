@@ -54,7 +54,7 @@ def main():
     df4 = prepare_df(
         df4,
         input_cols=['Code', 'Destination', 'Price', 'Increment'],
-        rename_cols=['Code', 'Destination Forex', 'Forex Price', 'Forex Increment']
+        rename_cols=['Code', 'Destination SVM', 'SVM Price', 'SVM Increment']
     )
     df5 = prepare_df(
         df5,
@@ -67,7 +67,7 @@ def main():
     df_all = pd.merge(df_all, df4, on='Code', how='outer')
     df_all = pd.merge(df_all, df5, on='Code', how='outer')
 
-    for col in ['Pxn Price', 'SkyTel Price', 'SmartNet Price', 'Forex Price', 'RingHD Price']:
+    for col in ['Pxn Price', 'SkyTel Price', 'SmartNet Price', 'SVM Price', 'RingHD Price']:
         df_all[col] = pd.to_numeric(df_all[col], errors='coerce')
 
     def find_best(row):
@@ -75,7 +75,7 @@ def main():
             'Pxn': row.get('Pxn Price', float('inf')),
             'SkyTel': row.get('SkyTel Price', float('inf')),
             'SmartNet': row.get('SmartNet Price', float('inf')),
-            'Forex': row.get('Forex Price', float('inf')),
+            'SVM': row.get('SVM Price', float('inf')),
             'RingHD': row.get('RingHD Price', float('inf')),
         }
         prices = {k: (v if pd.notna(v) else float('inf')) for k, v in prices.items()}
