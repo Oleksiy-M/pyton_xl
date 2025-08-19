@@ -1,0 +1,11 @@
+PS D:\Film> .\yt-dlp.exe "https://0a2-ebd-400gv.stream-balancer-allo-1.live/M2/4/0/1755620811/ZGpBK9Au01eWK1EukoOIXg/5/1080/1/76175/index-f1-v1.m3u8" `
+>>   --add-header "Referer: https://sign-as.stloadi.live" `
+>>   --add-header "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" `
+>>   --add-header "Origin: https://sign-as.stloadi.live" `
+>>   -o "videoV1.mp4"
+
+
+
+
+
+ffmpeg -i "index-f1-v1.m3u8" -i "index-f1-a1.m3u8" -c copy -map 0:v:0 -map 1:a:0 -f mp4 output.mp4
