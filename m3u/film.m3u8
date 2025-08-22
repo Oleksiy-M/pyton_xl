@@ -1,0 +1,42 @@
+PS D:\Film> .\yt-dlp.exe "https://e17-2c0-402gv.stream-balancer-allo-1.live/M2/69/1/1755643746/9brNzYx-eB4950xE8BaAfw/5/1080/2/1049756/index-f1-a1.m3u8" `
+>>   --add-header "Referer: https://sign-as.stloadi.live" `
+>>   --add-header "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" `
+>>   --add-header "Origin: https://sign-as.stloadi.live" `
+>>   -o "AUDIO Ace Ventura.mp4"
+
+
+
+
+PS D:\Film> ffmpeg -i "Kung-Fury.mp4" -i "AUDIO" `
+>>   -map 0:v -map 0:a -map 1:a `
+>>   -c copy `
+>>   -metadata:s:a:0 language=eng `
+>>   -metadata:s:a:1 language=rus `
+>>   "Kung Fury"
+
+
+ffmpeg -i "Kung-Fury.mp4" -i "AUDIO.mp4" `
+  -map 0:v -map 0:a:0 -map 0:a:1 -map 1:a `
+  -c copy `
+  -metadata:s:a:0 language=ukr `
+  -metadata:s:a:1 language=rus `
+  -metadata:s:a:2 language=eng `
+  "Kung Fury - 3langs.mp4"
+
+
+  ffmpeg -i "Kung Fury - 3langs.mp4" -i "KarateKid.srt" `
+  -c copy `
+  -c:s mov_text `
+  -metadata:s:s:0 language=rus `
+  "Kung Fury - 3langs+subs.mp4"
+
+
+  ffmpeg -i input.vtt output.srt
+
+
+
+  ffmpeg -i "The Karate Kid+sub.mp4" -i "subtitles_ru.srt" ^
+  -map 0 -map 1 ^
+  -c copy -c:s mov_text ^
+  -metadata:s:s:1 language=rus ^
+  "The Karate Kid+sub+ru.mp4"
